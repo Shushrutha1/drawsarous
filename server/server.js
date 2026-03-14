@@ -19,7 +19,7 @@ function startTimer(room) {
     if (roomTimers[room]) clearInterval(roomTimers[room].interval);
 
     roomTimers[room] = {
-        timeLeft: 60,
+        timeLeft: 180,
         interval: setInterval(() => {
             if (!roomData[room] || roomData[room].players.length < 2) {
                 clearInterval(roomTimers[room].interval);
