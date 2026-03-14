@@ -53,12 +53,15 @@
             <ul id="userList"></ul>
         </div>
     </div>
-
+    <div id="wordPicker" style="display:none; position:fixed; top:50%; left:50%; transform:translate(-50%,-50%); background:#16213e; padding:30px; border-radius:20px; z-index:10000; text-align:center; border: 2px solid #4ecca3;">
+    <h3>Choose a Word</h3>
+    <div id="wordOptions"></div>
+</div>
     <main class="game-container">
     
-    <aside class="sidebar">
-        <h4 style="color: #4ecca3; text-align: center;">Players</h4>
-        <ul id="sidebarUserList"></ul>
+    <aside class="sidebar-scoreboard">
+        <div class="scoreboard-header">🏆 Rankings</div>
+        <ul id="liveScoreboard"></ul>
     </aside>
 
     <section class="canvas-wrapper">

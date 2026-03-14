@@ -161,14 +161,34 @@ socket.on('message', (data) => {
 playerListBtn.onclick = () => playerModal.style.display = "block";
 document.querySelector(".close").onclick = () => playerModal.style.display = "none";
 
+// Handle Live Scoreboard (Beside Canvas)
 socket.on('updatePlayerList', (players) => {
-    playerCountUI.innerText = players.length;
-    // Map scores to the player list
-    userListUI.innerHTML = players.map(p => 
-        `<li>${p.name}: <b style="color:#4ecca3">${p.score} pts</b> ${p.name === myName ? "(You)" : ""}</li>`
-    ).join("");
+    const list = document.getElementById('liveScoreboard');
+    // Sort so highest score is at the top
+    const sorted = [...players].sort((a, b) => b.score - a.score);
+    
+    list.innerHTML = sorted.map(p => `
+        <li>
+            <span>${p.name}</span>
+            <span style="color:#4ecca3">${p.score}</span>
+        </li>
+    `).join("");
 });
 
+// Handle Game End
+socket.on('gameFinished', (winners) => {
+    const overlay = document.getElementById('winnerOverlay');
+    const nameDisplay = document.getElementById('winnerName');
+    
+    overlay.style.display = 'flex';
+    nameDisplay.innerText = winners[0].name; // The player with highest score
+    
+    // Optionally list top 3 in the winnerScore P tag
+    document.getElementById('winnerScore').innerHTML = `
+        1st: ${winners[0].name} (${winners[0].score})<br>
+        2nd: ${winners[1] ? winners[1].name : '-'} (${winners[1] ? winners[1].score : '0'})
+    `;
+});
 document.getElementById("quitBtn").onclick = () => {
     if (confirm("Quit game?")) {
         socket.disconnect();
@@ -176,3 +196,25 @@ document.getElementById("quitBtn").onclick = () => {
         window.location.href = "index.html";
     }
 };
+
+socket.on('wordChoices', (choices) => {
+    const picker = document.getElementById('wordPicker');
+    const options = document.getElementById('wordOptions');
+    options.innerHTML = '';
+    picker.style.display = 'block';
+
+    choices.forEach(word => {
+        const btn = document.createElement('button');
+        btn.innerText = word;
+        btn.style.margin = "10px";
+        btn.onclick = () => {
+            socket.emit('wordSelected', word);
+            picker.style.display = 'none';
+        };
+        options.appendChild(btn);
+    });
+});
+
+socket.on('drawerChoosing', (data) => {
+    document.getElementById('drawerNotification').innerText = `${data.drawerName} is choosing a word...`;
+});

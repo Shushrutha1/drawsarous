@@ -7,7 +7,7 @@ const app = express();
 const server = http.createServer(app);
 const io = new Server(server);
 
-const words = ["Pizza", "Elephant", "Tower", "Laptop", "Mountain", "Guitar", "Sunshine", "Submarine", "Lotus", "Tree", "Mobile", "Coffee", "Rocket", "Anchor"];
+const words = ["Pizza", "Elephant", "Tower", "Laptop", "Mountain", "Guitar", "Sunshine", "Submarine", "Lotus", "Tree", "Mobile", "Coffee", "Rocket", "Anchor", "Castle", "Dragon", "Bicycle"];
 let roomData = {}; 
 let roomTimers = {}; 
 
@@ -21,7 +21,7 @@ function startTimer(room) {
     roomTimers[room] = {
         timeLeft: 60,
         interval: setInterval(() => {
-            if (!roomData[room]) {
+            if (!roomData[room] || roomData[room].players.length < 2) {
                 clearInterval(roomTimers[room].interval);
                 return;
             }
@@ -40,32 +40,31 @@ function startTimer(room) {
 
 function startNewRound(room) {
     const r = roomData[room];
-    if (!r || r.players.length === 0) return;
-
-    // 1. Rotate Drawer
-    if (r.drawerIndex === undefined || r.drawerIndex >= r.players.length - 1) {
-        r.drawerIndex = 0;
-    } else {
-        r.drawerIndex++;
+    // FEATURE: Stop the game/timer if we aren't playing (less than 2 players)
+    if (!r || r.players.length < 2) {
+        if (roomTimers[room]) clearInterval(roomTimers[room].interval);
+        io.to(room).emit('timerUpdate', 0);
+        io.to(room).emit('message', { user: "System", text: "Waiting for more players to start..." });
+        return;
     }
 
+    // 1. Rotate Drawer
+    r.drawerIndex = (r.drawerIndex === undefined || r.drawerIndex >= r.players.length - 1) ? 0 : r.drawerIndex + 1;
     const drawer = r.players[r.drawerIndex];
 
-    // 2. Setup Round
-    r.word = words[Math.floor(Math.random() * words.length)];
+    // 2. FEATURE: Choose 3 random words for selection
+    let shuffled = [...words].sort(() => 0.5 - Math.random());
+    let choices = shuffled.slice(0, 3);
+
     r.players.forEach(p => p.hasGuessed = false);
+    r.isChoosing = true; // State: Player is currently picking a word
 
     // 3. Notify Clients
-    io.to(room).emit('clear'); // Clear board for everyone
-    io.to(room).emit('newRound', { 
-        drawerId: drawer.id, 
-        drawerName: drawer.name 
-    });
-
-    // 4. Send word only to drawer
-    io.to(drawer.id).emit('secretWord', r.word);
-
-    startTimer(room);
+    io.to(room).emit('clear');
+    io.to(room).emit('drawerChoosing', { drawerName: drawer.name });
+    
+    // Send the 3 choices ONLY to the drawer
+    io.to(drawer.id).emit('wordChoices', choices);
 }
 
 // --- SOCKET CONNECTION ---
@@ -81,48 +80,57 @@ io.on("connection", (socket) => {
         if (!roomData[room]) {
             roomData[room] = {
                 players: [],
-                word: words[Math.floor(Math.random() * words.length)],
+                word: "",
                 mode: mode,
-                drawerIndex: 0
+                drawerIndex: -1,
+                isChoosing: false
             };
-            // The first person to join is the first drawer
         }
 
         const newPlayer = { id: socket.id, name: name, score: 0, hasGuessed: false };
         roomData[room].players.push(newPlayer);
 
-        io.to(room).emit("message", { user: "System", text: `${name} joined the game!` });
+        io.to(room).emit("message", { user: "System", text: `${name} joined!` });
         io.to(room).emit("updatePlayerList", roomData[room].players);
 
-        // If it's the very first player, start the game
-        if (roomData[room].players.length === 1) {
+        // Auto-start if it's the 2nd player
+        if (roomData[room].players.length === 2) {
             startNewRound(room);
-        } else {
-            // New players need to know who is currently drawing
-            const currentDrawer = roomData[room].players[roomData[room].drawerIndex];
-            socket.emit('newRound', { 
-                drawerId: currentDrawer.id, 
-                drawerName: currentDrawer.name 
-            });
         }
+    });
+
+    // FEATURE: Handler for when drawer picks 1 of the 3 words
+    socket.on("wordSelected", (selectedWord) => {
+        const r = roomData[socket.room];
+        if (!r) return;
+        
+        r.word = selectedWord;
+        r.isChoosing = false;
+        const drawer = r.players[r.drawerIndex];
+
+        io.to(socket.room).emit('newRound', { 
+            drawerId: drawer.id, 
+            drawerName: drawer.name 
+        });
+
+        io.to(drawer.id).emit('secretWord', r.word);
+        startTimer(socket.room); // Start timer ONLY after word is chosen
     });
 
     socket.on("chatMessage", (data) => {
         const room = roomData[data.room];
-        if (!room) return;
+        if (!room || room.isChoosing) return;
 
         const player = room.players.find(p => p.id === socket.id);
         const drawer = room.players[room.drawerIndex];
 
         if (!player || !drawer) return;
 
-        // Prevent drawer from typing the answer
         const guess = data.text.trim().toLowerCase();
         const actualWord = room.word.toLowerCase();
 
         if (socket.id === drawer.id) {
-            // Drawer chatting (prevent them from typing the word)
-            if (guess.includes(actualWord)) {
+            if (guess.includes(actualWord) && actualWord !== "") {
                 socket.emit('message', { user: "System", text: "❌ Don't spoil the word!" });
             } else {
                 io.to(data.room).emit("message", data);
@@ -130,49 +138,36 @@ io.on("connection", (socket) => {
             return;
         }
 
-        // Guessing Logic
-        if (guess === actualWord && !player.hasGuessed) {
+        if (guess === actualWord && !player.hasGuessed && actualWord !== "") {
             player.score += 50;
             player.hasGuessed = true;
-
             socket.emit("guessCorrect");
-            io.to(data.room).emit("message", { user: "🎉 System", text: `${player.name} guessed the word!` });
+            io.to(data.room).emit("message", { user: "🎉 System", text: `${player.name} guessed it!` });
             io.to(data.room).emit("updatePlayerList", room.players);
 
-            // If everyone except drawer guessed correctly, end round early
             const guessers = room.players.filter(p => p.id !== drawer.id);
             if (guessers.every(p => p.hasGuessed)) {
                 clearInterval(roomTimers[data.room].interval);
-                io.to(data.room).emit('message', { user: "System", text: "Everyone got it! Next round..." });
                 setTimeout(() => startNewRound(data.room), 2000);
             }
         } else {
-            // Normal message
             io.to(data.room).emit("message", data);
         }
     });
 
     socket.on("draw", (data) => {
         const room = roomData[data.room];
-        if (!room) return;
+        if (!room || room.isChoosing) return;
         const drawer = room.players[room.drawerIndex];
-        
-        // Security: Only broadcast if the sender is actually the drawer
         if (drawer && socket.id === drawer.id) {
             socket.to(data.room).emit("draw", data);
         }
     });
 
-    socket.on("stopPath", (data) => {
-        socket.to(data.room).emit("stopPath");
-    });
-
+    socket.on("stopPath", (data) => socket.to(data.room).emit("stopPath"));
     socket.on("clear", (data) => {
         const room = roomData[data.room];
-        if (!room) return;
-        const drawer = room.players[room.drawerIndex];
-        
-        if (drawer && socket.id === drawer.id) {
+        if (room && room.players[room.drawerIndex]?.id === socket.id) {
             io.to(data.room).emit("clear");
         }
     });
@@ -181,15 +176,16 @@ io.on("connection", (socket) => {
         const r = socket.room;
         if (r && roomData[r]) {
             roomData[r].players = roomData[r].players.filter(p => p.id !== socket.id);
-            io.to(r).emit("message", { user: "System", text: `${socket.username} left.` });
             io.to(r).emit("updatePlayerList", roomData[r].players);
 
-            if (roomData[r].players.length === 0) {
+            if (roomData[r].players.length < 2) {
                 if (roomTimers[r]) clearInterval(roomTimers[r].interval);
-                delete roomData[r];
-                delete roomTimers[r];
+                if (roomData[r].players.length === 0) {
+                    delete roomData[r];
+                    delete roomTimers[r];
+                }
             } else {
-                // If the drawer left, start a new round immediately
+                // If drawer leaves, skip to next round
                 startNewRound(r);
             }
         }

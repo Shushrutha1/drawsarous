@@ -139,7 +139,46 @@ input[type="range"] {
     transition: transform 0.3s ease;
 }
 
+.game-container {
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+    align-items: flex-start;
+    gap: 15px;
+    width: 100%;
+}
 
+.sidebar-scoreboard {
+    width: 200px;
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 15px;
+    padding: 10px;
+    height: 585px; /* Matches Canvas + Banner height */
+    border: 1px solid #4ecca3;
+}
+
+.scoreboard-header {
+    text-align: center;
+    font-weight: bold;
+    color: #4ecca3;
+    padding-bottom: 10px;
+    border-bottom: 1px solid rgba(255,255,255,0.1);
+    margin-bottom: 10px;
+}
+
+#liveScoreboard {
+    list-style: none;
+    padding: 0;
+}
+
+#liveScoreboard li {
+    padding: 8px 12px;
+    margin-bottom: 5px;
+    background: rgba(0,0,0,0.2);
+    border-radius: 8px;
+    display: flex;
+    justify-content: space-between;
+}
 /* 💬 Chat Section */
 .chat-container {
     width: 320px;
