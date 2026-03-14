@@ -1,15 +1,15 @@
 # Drawsarous
 
-Online multiplayer drawing and guessing game.
+Online collaborative drawing and guessing game.
 
 ## Tech Stack
-Node.js
-Socket.IO
-MySQL
-HTML/CSS/JS
+- Node.js
+- Socket.IO
+- MySQL
+- HTML / CSS / JavaScript
 
 ## Features
-- Real-time collaborative drawing
-- Chat-based guessing
+- Real-time multiplayer drawing
+- Chat guessing system
 - Brush tools
-- Multiplayer support
+- Collaborative canvas
