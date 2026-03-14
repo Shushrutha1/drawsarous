@@ -7,8 +7,23 @@ const app = express();
 const server = http.createServer(app);
 const io = new Server(server);
 
-const words = ["Pizza", "Elephant", "Tower", "Laptop", "Mountain", "Guitar", "Sunshine", "Submarine", "Lotus", "Tree", "Mobile", "Coffee", "Rocket", "Anchor", "Castle", "Dragon", "Bicycle"];
-let roomData = {}; 
+const words = [
+"Pizza", "Elephant", "Tower", "Laptop", "Mountain", "Guitar", "Sunshine",
+"Submarine", "Lotus", "Tree", "Mobile", "Coffee", "Rocket", "Anchor",
+"Castle", "Dragon", "Bicycle",
+
+"Banana", "Ice Cream", "Burger", "Rainbow", "Crown", "Treasure", "Island",
+"Volcano", "Robot", "Alien", "Spaceship", "Balloon", "Fireworks",
+"Camera", "Headphones", "Keyboard", "Microscope", "Compass",
+
+"Panda", "Penguin", "Octopus", "Shark", "Dinosaur", "Monkey",
+
+"Skateboard", "Rollercoaster", "Bridge", "Lighthouse", "Windmill",
+
+"Backpack", "Clock", "Umbrella", "Candle", "Key", "Lock",
+
+"Ghost", "Wizard", "Knight", "Pirate", "Superhero","Vampire", "Mermaid", "Fairy", "Zombie", "Alien", "Robot","Dragon", "Unicorn", "Giant", "Witch", "Ninja", "Samurai", "Clown", "Detective", "Astronaut", "Batman", "Spiderman", "Ironman", "Captain America", "Thor", "Hulk", "Black Widow", "Flash", "Green Lantern", "Wonder Woman"
+];let roomData = {}; 
 let roomTimers = {}; 
 
 app.use(express.static(path.join(__dirname, "../public")));
