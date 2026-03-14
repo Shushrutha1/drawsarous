@@ -1,14 +1,52 @@
 <!DOCTYPE html>
 <html>
 <head>
-<title>Drawsarous</title>
+    <title>Drawsarous - Join Game</title>
+    <link rel="stylesheet" href="style.css">
 </head>
+<body class="lobby-body">
+  <div class="login-card">
+    <h1>🎨 Drawsarous</h1>
+    <input type="text" id="usernameInput" placeholder="Your Name..." maxlength="15">
+    
+    <hr style="margin: 20px 0; border: 0.5px solid rgba(255,255,255,0.2);">
 
-<body>
+    <div class="lobby-section">
+        <button id="createBtn" style="background: #4ecca3;">Create New Room</button>
+        <p id="generatedCodeDisplay" style="margin-top: 10px; font-weight: bold; color: #4ecca3;"></p>
+    </div>
 
-<h1>Welcome to Drawsarous 🎨</h1>
+    <p>— OR —</p>
 
-<a href="game.html">Start Game</a>
+    <div class="lobby-section">
+        <input type="text" id="roomInput" placeholder="Enter 4-Digit Code" maxlength="4">
+        <button id="startBtn">Join Existing Room</button>
+    </div>
+</div>
 
+<script>
+    let generatedRoomCode = null;
+
+    // Function to generate 4-digit code
+    document.getElementById('createBtn').addEventListener('click', () => {
+        generatedRoomCode = Math.floor(1000 + Math.random() * 9000).toString();
+        document.getElementById('generatedCodeDisplay').innerText = "Your Room Code: " + generatedRoomCode;
+        document.getElementById('roomInput').value = generatedRoomCode; // Auto-fill for the creator
+    });
+
+    // Handle the actual Entry
+    document.getElementById('startBtn').addEventListener('click', () => {
+        const name = document.getElementById('usernameInput').value;
+        const room = document.getElementById('roomInput').value;
+
+        if (name.trim() !== "" && room.length === 4) {
+            sessionStorage.setItem('drawName', name);
+            sessionStorage.setItem('drawRoom', room);
+            window.location.href = "game.html";
+        } else {
+            alert("Enter your name and a 4-digit code!");
+        }
+    });
+</script>
 </body>
 </html>

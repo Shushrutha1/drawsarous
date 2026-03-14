@@ -1,47 +1,81 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-<title>Drawsarous</title>
-
-<script src="/socket.io/socket.io.js"></script>
-<link rel="stylesheet" href="style.css">
-
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Drawsarous - Game</title>
+    <script src="/socket.io/socket.io.js"></script>
+    <link rel="stylesheet" href="style.css">
 </head>
-
 <body>
-<h1 class="title"> Drawsarous</h1>
 
-<div class="toolbar">
+    <div id="winnerOverlay" class="winner-screen">
+        <div class="winner-content">
+            <h1 style="font-size: 4rem;">🏆</h1>
+            <h2>WE HAVE A WINNER!</h2>
+            <h1 id="winnerName" style="color: #f7d794; font-size: 3rem;">---</h1>
+            <p id="winnerScore" style="font-size: 1.5rem;"></p>
+            <p style="margin-top: 20px; color: #4ecca3;">New game starting soon...</p>
+        </div>
+    </div>
 
-<label>Color</label>
-<input type="color" id="colorPicker" value="#000000">
+    <header class="game-header">
+        <div class="header-left">
+            <h1 class="title">🎨 Drawsarous</h1>
+            <span id="roomDisplay"></span>
+        </div>
+        <div id="timerContainer">
+            ⏱ <span id="timer">60</span>s
+        </div>
+        <div id="wordDisplay"></div>
+    </header>
 
-<label>Size</label>
-<input type="range" id="brushSize" min="1" max="20" value="3">
+    <nav class="toolbar">
+        <button id="playerListBtn">👥 Players (<span id="playerCount">0</span>)</button>
+        <div class="tool-group">
+            <label>Color</label>
+            <input type="color" id="colorPicker" value="#000000">
+        </div>
+        <div class="tool-group">
+            <label>Size</label>
+            <input type="range" id="brushSize" min="1" max="20" value="3">
+        </div>
+        <button id="eraser" class="btn-secondary">Eraser</button>
+        <button id="clear" class="btn-danger">Clear Board</button>
+        <button id="quitBtn" class="btn-exit">Quit Game</button>
+    </nav>
 
-<button id="eraser">Eraser</button>
-<button id="clear">Clear</button>
+    <div id="playerModal" class="modal">
+        <div class="modal-content">
+            <span class="close">&times;</span>
+            <h2>Players & Scores</h2>
+            <hr>
+            <ul id="userList"></ul>
+        </div>
+    </div>
 
-</div>
+    <main class="game-container">
+    
+    <aside class="sidebar">
+        <h4 style="color: #4ecca3; text-align: center;">Players</h4>
+        <ul id="sidebarUserList"></ul>
+    </aside>
 
-<div class="game-container">
+    <section class="canvas-wrapper">
+        <div id="drawerNotification" class="system-banner">Waiting...</div>
+        <canvas id="board" width="800" height="550"></canvas>
+    </section>
 
-<div class="board-container">
-<canvas id="board" width="800" height="600"></canvas>
-</div>
+    <section class="chat-container">
+        <h3 id="chatTitle">Chat</h3>
+        <div id="chat"></div>
+        <div class="chat-input-wrapper">
+            <input type="text" id="chatInput" placeholder="Type your guess here...">
+        </div>
+    </section>
 
-<div class="chat-container">
+</main>
 
-<h3>Chat</h3>
-
-<div id="chat"></div>
-
-<input type="text" id="chatInput" placeholder="Guess the word...">
-
-</div>
-
-</div>
-
-<script src="script.js"></script>
+    <script src="script.js"></script>
 </body>
 </html>

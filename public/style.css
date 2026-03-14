@@ -12,7 +12,80 @@ body {
     min-height: 100vh;
     color: #e9ecef;
 }
+/* Ensure the container stays in a single row */
+.game-container {
+    display: flex;
+    flex-direction: row; /* Force side-by-side */
+    justify-content: center;
+    align-items: flex-start;
+    gap: 20px;
+    width: 98%;
+    max-width: 1400px;
+    margin: 20px auto;
+    flex-wrap: nowrap; /* Prevent chat from dropping down */
+}
 
+/* LEFT: Player Sidebar */
+.sidebar {
+    width: 200px;
+    height: 585px; /* Matches Canvas + Banner height */
+    background: rgba(0, 0, 0, 0.3);
+    border-radius: 15px;
+    padding: 10px;
+    overflow-y: auto;
+}
+
+/* CENTER: Canvas Wrapper */
+.canvas-wrapper {
+    flex-shrink: 0; /* Prevents canvas from getting squashed */
+}
+
+#board {
+    background: #ffffff;
+    border-radius: 0 0 15px 15px;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+    display: block;
+}
+
+/* RIGHT: Chat Container */
+.chat-container {
+    width: 350px;
+    height: 585px; /* Matches Canvas + Banner height */
+    background: rgba(255, 255, 255, 0.05);
+    backdrop-filter: blur(15px);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 20px;
+    padding: 15px;
+    display: flex;
+    flex-direction: column;
+}
+
+/* Make sure the game doesn't break on smaller screens */
+@media (max-width: 1200px) {
+    #board {
+        width: 600px; /* Scale down canvas for laptops */
+        height: 400px;
+    }
+}
+.game-container {
+    display: flex !important;
+    flex-direction: row !important; /* Forces side-by-side */
+    flex-wrap: nowrap !important;   /* Prevents wrapping */
+    justify-content: center;
+    align-items: flex-start;
+    gap: 20px;
+    width: 100%;
+    margin-top: 20px;
+}
+
+.canvas-wrapper {
+    flex: 0 0 800px; /* Forces canvas to stay at 800px */
+}
+
+.chat-container {
+    flex: 0 0 350px; /* Forces chat to stay at 350px */
+    height: 585px;   /* Match canvas + banner height */
+}
 /* 🎨 Title with a glowing effect */
 .title {
     font-size: 3rem;
@@ -57,14 +130,6 @@ input[type="range"] {
 }
 
 /* 🎮 Game Layout */
-.game-container {
-    display: flex;
-    flex-wrap: wrap;
-    justify-content: center;
-    gap: 30px;
-    width: 100%;
-    max-width: 1200px;
-}
 
 /* 🖌 Canvas Board */
 #board {
@@ -73,6 +138,7 @@ input[type="range"] {
     box-shadow: 0 20px 50px rgba(0, 0, 0, 0.5);
     transition: transform 0.3s ease;
 }
+
 
 /* 💬 Chat Section */
 .chat-container {
@@ -163,3 +229,312 @@ button:hover {
 #eraser {
     background: #6c757d;
 }
+
+/* Lobby Styling */
+.lobby-body {
+    justify-content: center;
+}
+
+.login-card {
+    background: rgba(255, 255, 255, 0.1);
+    backdrop-filter: blur(10px);
+    padding: 40px;
+    border-radius: 20px;
+    text-align: center;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+}
+
+#usernameInput {
+    display: block;
+    width: 250px;
+    padding: 12px;
+    margin: 20px auto;
+    border-radius: 10px;
+    border: none;
+    outline: none;
+}
+
+/* Chat Bubbles Style */
+.message-wrapper {
+    display: flex;
+    flex-direction: column;
+    margin-bottom: 10px;
+}
+
+.msg-bubble {
+    max-width: 80%;
+    padding: 8px 12px;
+    border-radius: 15px;
+    position: relative;
+    font-size: 0.9rem;
+}
+
+/* My messages go right */
+.msg-bubble.me {
+    align-self: flex-end;
+    background: #2575fc;
+    color: white;
+    border-bottom-right-radius: 2px;
+}
+
+/* Others messages go left */
+.msg-bubble.others {
+    align-self: flex-start;
+    background: #ffffff;
+    color: #333;
+    border-bottom-left-radius: 2px;
+}
+
+.user-tag {
+    font-size: 0.7rem;
+    font-weight: bold;
+    display: block;
+    margin-bottom: 3px;
+    color: #4ecca3;
+}
+
+.msg-bubble.me .user-tag {
+    color: #ffd700; /* Gold color for your own name */
+}
+
+/* Modal Background */
+.modal {
+    display: none; 
+    position: fixed;
+    z-index: 1000;
+    left: 0; top: 0;
+    width: 100%; height: 100%;
+    background-color: rgba(0,0,0,0.6);
+    backdrop-filter: blur(5px);
+}
+
+/* Modal Box */
+.modal-content {
+    background: #16213e;
+    margin: 10% auto;
+    padding: 20px;
+    border: 1px solid #4ecca3;
+    width: 300px;
+    border-radius: 20px;
+    color: white;
+    text-align: center;
+}
+
+.close {
+    float: right;
+    font-size: 28px;
+    cursor: pointer;
+    color: #e94560;
+}
+
+#userList {
+    list-style: none;
+    padding: 0;
+    margin-top: 20px;
+}
+
+#userList li {
+    padding: 10px;
+    border-bottom: 1px solid rgba(255,255,255,0.1);
+    font-weight: 600;
+}
+
+#quitBtn {
+    background: #ff4b2b; /* Reddish-orange */
+    margin-left: auto;   /* Pushes it to the far right of the toolbar */
+}
+
+#quitBtn:hover {
+    background: #ff2e63;
+    box-shadow: 0 5px 15px rgba(255, 75, 43, 0.4);
+}
+
+.system-msg {
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 8px;
+    padding: 5px 10px;
+    margin: 10px 0;
+    font-size: 0.8rem;
+    font-style: italic;
+    color: #4ecca3;
+    text-align: center;
+    border: 1px dashed rgba(78, 204, 163, 0.4);
+}
+
+#wordDisplay {
+    background: rgba(0, 0, 0, 0.4);
+    padding: 10px 20px;
+    border-radius: 10px;
+    display: none; /* Hidden unless you are the drawer */
+    margin-bottom: 15px;
+    border: 2px solid #ff9f43;
+}
+
+#chatInput {
+    transition: all 0.4s ease;
+    border: 2px solid transparent;
+}
+
+#chatInput:disabled {
+    cursor: not-allowed;
+    opacity: 0.8;
+    border: 2px solid #4ecca3;
+}
+@import url('https://fonts.googleapis.com/css2?family=Quicksand:wght@400;600;700&display=swap');
+
+body {
+    font-family: 'Quicksand', sans-serif;
+    background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%);
+    margin: 0; padding: 0;
+    display: flex; flex-direction: column; align-items: center;
+    min-height: 100vh; color: #e9ecef; overflow-x: hidden;
+}
+
+/* --- Winner Screen --- */
+.winner-screen {
+    display: none; position: fixed;
+    top: 0; left: 0; width: 100%; height: 100%;
+    background: rgba(26, 26, 46, 0.98);
+    z-index: 5000; justify-content: center; align-items: center;
+    text-align: center; animation: fadeIn 0.5s ease;
+}
+.winner-content {
+    padding: 50px; border: 3px solid #f7d794;
+    border-radius: 30px; background: rgba(255, 255, 255, 0.05);
+    box-shadow: 0 0 50px rgba(247, 215, 148, 0.3);
+}
+
+/* --- Game Layout --- */
+.game-header {
+    width: 100%; display: flex; justify-content: space-between;
+    align-items: center; padding: 15px 40px; background: rgba(0,0,0,0.2);
+    border-bottom: 2px solid #4ecca3; box-sizing: border-box;
+}
+
+.game-container {
+    display: flex; justify-content: center; gap: 20px;
+    width: 95%; max-width: 1300px; margin-top: 20px;
+}
+
+
+.system-banner {
+    background: #f7d794; color: #1a1a2e;
+    padding: 8px; text-align: center; font-weight: bold;
+    border-radius: 15px 15px 0 0;
+}
+
+#board {
+    background: #ffffff; border-radius: 0 0 15px 15px;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+}
+
+.chat-container {
+    width: 320px; height: 585px;
+    background: rgba(255,255,255,0.05); border-radius: 20px;
+    padding: 15px; display: flex; flex-direction: column;
+}
+
+/* --- Utilities --- */
+#timerContainer {
+    font-size: 1.8rem; font-weight: bold; background: #e94560;
+    padding: 5px 20px; border-radius: 50px;
+}
+
+#wordDisplay {
+    background: rgba(0, 0, 0, 0.4); padding: 10px 20px;
+    border-radius: 10px; border: 2px solid #ff9f43;
+    display: none; font-weight: bold;
+}
+
+.toolbar {
+    margin: 20px 0; background: rgba(255,255,255,0.1);
+    backdrop-filter: blur(10px); padding: 10px 25px;
+    border-radius: 50px; display: flex; gap: 20px; align-items: center;
+}
+
+@keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+
+
+@import url('https://fonts.googleapis.com/css2?family=Quicksand:wght@400;600;700&display=swap');
+
+body {
+    font-family: 'Quicksand', sans-serif;
+    background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%);
+    margin: 0; padding: 0;
+    display: flex; flex-direction: column; align-items: center;
+    min-height: 100vh; color: #e9ecef; overflow-x: hidden;
+}
+
+/* --- Winner Screen --- */
+.winner-screen {
+    display: none; position: fixed;
+    top: 0; left: 0; width: 100%; height: 100%;
+    background: rgba(26, 26, 46, 0.98);
+    z-index: 5000; justify-content: center; align-items: center;
+    text-align: center; animation: fadeIn 0.5s ease;
+}
+.winner-content {
+    padding: 50px; border: 3px solid #f7d794;
+    border-radius: 30px; background: rgba(255, 255, 255, 0.05);
+    box-shadow: 0 0 50px rgba(247, 215, 148, 0.3);
+}
+
+/* --- Game Layout --- */
+.game-header {
+    width: 100%; display: flex; justify-content: space-between;
+    align-items: center; padding: 15px 40px; background: rgba(0,0,0,0.2);
+    border-bottom: 2px solid #4ecca3; box-sizing: border-box;
+}
+
+.title { font-size: 2.5rem; text-shadow: 0 0 15px rgba(37, 117, 252, 0.6); margin: 0; }
+
+.game-container {
+    display: flex !important; flex-direction: row !important;
+    flex-wrap: nowrap !important; justify-content: center;
+    align-items: flex-start; gap: 20px; width: 98%; margin-top: 20px;
+}
+
+.sidebar {
+    width: 220px; height: 585px; background: rgba(0, 0, 0, 0.3);
+    border-radius: 15px; padding: 10px; overflow-y: auto;
+}
+
+#sidebarUserList { list-style: none; padding: 0; }
+#sidebarUserList li {
+    background: rgba(255,255,255,0.1); margin-bottom: 8px;
+    padding: 10px; border-radius: 10px; border-left: 4px solid #4ecca3;
+}
+
+.canvas-wrapper { flex-shrink: 0; }
+
+.system-banner {
+    background: #f7d794; color: #1a1a2e; padding: 8px;
+    text-align: center; font-weight: bold; border-radius: 15px 15px 0 0;
+}
+
+#board {
+    background: #ffffff; border-radius: 0 0 15px 15px;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.5); display: block;
+}
+
+.chat-container {
+    width: 350px; height: 585px; background: rgba(255, 255, 255, 0.05);
+    backdrop-filter: blur(15px); border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 20px; padding: 15px; display: flex; flex-direction: column;
+}
+
+#chat { flex: 1; overflow-y: auto; margin-bottom: 15px; }
+
+/* --- Toolbar --- */
+.toolbar {
+    margin: 20px 0; background: rgba(255,255,255,0.1);
+    backdrop-filter: blur(10px); padding: 10px 25px;
+    border-radius: 50px; display: flex; gap: 20px; align-items: center;
+}
+
+#timerContainer {
+    font-size: 1.5rem; font-weight: bold; background: #e94560;
+    padding: 5px 20px; border-radius: 50px;
+}
+
+@keyframes fadeIn { from { opacity: 0; transform: scale(0.9); } to { opacity: 1; transform: scale(1); } }
