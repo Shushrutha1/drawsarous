@@ -1,6 +1,6 @@
 # Drawsarous
 
-Online multiplayer drawing and guessing game.
+Online multiplayer drawing game.
 
 ## Tech Stack
 Node.js
